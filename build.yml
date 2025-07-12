@@ -1,0 +1,37 @@
+name: Build Magisk Module
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Download Cloudflared Binary (ARM64)
+        run: |
+          mkdir -p core
+          curl -L -o core/cloudflared https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-arm64
+          chmod +x core/cloudflared
+
+      - name: Set Zip Filename
+        id: vars
+        run: echo "ZIP_NAME=cloudflared-magisk-${GITHUB_REF_NAME}.zip" >> $GITHUB_ENV
+
+      - name: Create Magisk Zip
+        run: |
+          mkdir out
+          zip -r out/$ZIP_NAME . -x ".git*" -x "*.md" -x "README*" -x "*.github*"
+
+      - name: Upload Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: out/*.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

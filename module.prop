@@ -1,0 +1,6 @@
+id=cloudflared
+name=Cloudflared Tunnel DNS
+version=2.3
+versionCode=203
+author=YourName
+description=Cloudflared DNS tunnel with watchdog, auto binary download and arch detection.
